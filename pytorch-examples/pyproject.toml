@@ -1,0 +1,20 @@
+[project]
+name = "pytorch-examples"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "Elizabeth Thomas",email = "email2eliza@gmail.com"}
+]
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "torch>=2.0.0",
+    "numpy>=1.24.0",
+]
+
+[tool.poetry]
+packages = [{include = "pytorch_examples", from = "src"}]
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
