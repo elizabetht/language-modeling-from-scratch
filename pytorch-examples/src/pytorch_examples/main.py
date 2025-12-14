@@ -66,6 +66,7 @@ def device():
     print(f"Number of GPUs available: {num_gpus}")
     for i in range(num_gpus):
         print(f"GPU {i}: {torch.cuda.get_device_name(i)}")
+        print(f"Device {i} properties: {torch.cuda.get_device_properties(i)}")
 
 def memory():
     memory_allocated = torch.cuda.memory_allocated()
@@ -94,7 +95,7 @@ def matmul():
     assert c.size() == (16,2)
 
 if __name__ == "__main__":
-    precision()
-    # device()
+    # precision()
+    device()
     # memory()
     # matmul()
