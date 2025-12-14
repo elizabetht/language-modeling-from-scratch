@@ -12,6 +12,13 @@ dependencies = [
     "numpy>=1.24.0",
 ]
 
+[project.optional-dependencies]
+cuda = ["torch"]
+
+[tool.pip]
+# Install PyTorch with CUDA support
+extra-index-url = "https://download.pytorch.org/whl/nightly/cu130"
+
 [tool.poetry]
 packages = [{include = "pytorch_examples", from = "src"}]
 

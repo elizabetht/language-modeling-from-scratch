@@ -10,7 +10,7 @@ def main():
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     
     print(f"PyTorch Device: {device}")
-    print(f"CUDA Available: {torch.cuda.is_available()}")
+    print(f"Num GPUs Available: {torch.cuda.device_count()}")
     
     if torch.cuda.is_available():
         print(f"CUDA Device Name: {torch.cuda.get_device_name(0)}")
