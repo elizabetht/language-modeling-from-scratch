@@ -87,6 +87,11 @@ def memory():
     # Note: PyTorch's memory allocator behavior varies by version
     # Older versions allocated 2x, newer versions may allocate exactly what's needed
 
+def tensor_slicing():
+    x = torch.tensor([[1,2,3],[4,5,6]])
+    y = x[0]
+    print("storage = same" if x.storage().data_ptr() == y.storage().data_ptr() else "storage = different")
+
 def matmul():
     a = torch.ones(16,32)
     b = torch.ones(32,2)
@@ -96,6 +101,7 @@ def matmul():
 
 if __name__ == "__main__":
     # precision()
-    device()
+    # device()
     # memory()
+    tensor_slicing()
     # matmul()
