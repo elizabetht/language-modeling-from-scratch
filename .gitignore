@@ -1,2 +1,7 @@
 .venv
 **/__pycache__/
+.env
+
+# Large model files - already uploaded to HuggingFace
+quantization/quantized_model/
+*.safetensors
