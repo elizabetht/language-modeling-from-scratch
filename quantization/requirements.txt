@@ -3,4 +3,5 @@ Pillow>=10.0.0
 requests>=2.31.0
 transformers>=4.40.0
 accelerate>=0.28.0
-quanto
+optimum-quanto
+python-dotenv
