@@ -3,5 +3,5 @@
 .env
 
 # Large model files - already uploaded to HuggingFace
-quantization/quantized_model/
+**/quantized_model/
 *.safetensors

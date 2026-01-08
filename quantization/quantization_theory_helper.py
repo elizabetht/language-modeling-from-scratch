@@ -22,7 +22,13 @@ def dtype_byte_size(dtype):
     import re
     if dtype == torch.bool:
         return 1 / 8
-    bit_search = re.search(r"[^\d](\d+)$", str(dtype))
+    
+    # Handle FP8 types (8-bit floating point)
+    dtype_str = str(dtype)
+    if "float8" in dtype_str:
+        return 1  # FP8 is 1 byte (8 bits)
+    
+    bit_search = re.search(r"[^\d](\d+)$", dtype_str)
     if bit_search is None:
         raise ValueError(f"`dtype` is not a valid dtype: {dtype}.")
     bit_size = int(bit_search.groups()[0])
