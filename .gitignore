@@ -5,3 +5,5 @@
 # Large model files - already uploaded to HuggingFace
 **/quantized_model/
 *.safetensors
+
+unsloth_compiled_cache/
