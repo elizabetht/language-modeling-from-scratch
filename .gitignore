@@ -8,3 +8,10 @@
 
 unsloth_compiled_cache/
 unsloth_training_checkpoints/
+
+hf/
+lora_model/
+model-torchao/
+outputs/
+
+
