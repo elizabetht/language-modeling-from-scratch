@@ -1,8 +1,8 @@
 # FP8 Quantization-Aware Training: How to Fine-Tune LLMs That Actually Work After Compression
 
-Running an 8-billion parameter model costs real money. Every GB of VRAM you can save translates to cheaper hardware. Every bit of precision you can drop means faster inference.
+Running an 8-billion parameter model costs real money. Every GB of VRAM saved translates to cheaper hardware. Every bit of precision dropped means faster inference.
 
-But here's the problem: when you quantize a model after training, accuracy drops. Sometimes a lot.
+But here's the problem: when a model is quantized after training, accuracy drops. Sometimes a lot.
 
 What if the model could learn to handle that precision loss during training instead of being blindsided by it at deployment?
 
@@ -12,15 +12,15 @@ That's exactly what Quantization-Aware Training does.
 
 ## The Problem with Post-Training Quantization
 
-Most quantization happens after training is complete. You take your perfectly trained model, compress the weights from 16-bit to 8-bit (or 4-bit), and hope for the best.
+Most quantization happens after training is complete. The process involves taking a perfectly trained model, compressing the weights from 16-bit to 8-bit (or 4-bit), and hoping for the best.
 
 The model was never trained to handle rounding errors. It's like training someone to be a surgeon with perfect lighting, then expecting them to operate in the dark.
 
-Sometimes it works fine. Sometimes your model starts hallucinating or loses its ability to follow instructions.
+Sometimes it works fine. Sometimes the model starts hallucinating or loses its ability to follow instructions.
 
 ## QAT: Training in the Dark on Purpose
 
-Quantization-Aware Training flips the script. During training, we simulate what quantization will do to the model. The technical term is "fake quantization."
+Quantization-Aware Training flips the script. During training, the process simulates what quantization will do to the model. The technical term is "fake quantization."
 
 Here's how it works:
 
@@ -32,7 +32,7 @@ Here's how it works:
 
 The model sees quantization noise during every training step. By the time training ends, the weights have adapted to work correctly even with reduced precision.
 
-When you actually quantize for deployment, the model isn't surprised. It's been practicing for this.
+When the model is actually quantized for deployment, it isn't surprised. It's been practicing for this.
 
 ---
 
@@ -43,13 +43,13 @@ Training an 8B parameter model normally requires storing:
 - 32GB for gradients
 - 64GB for Adam optimizer states (two values per parameter)
 
-That's 128GB just to start training. You're looking at multiple high-end GPUs.
+That's 128GB just to start training. This requires multiple high-end GPUs.
 
-LoRA (Low-Rank Adaptation) changes this equation. Instead of training all 8 billion parameters, you freeze the original weights and inject small trainable matrices into key layers. You end up training about 42 million parameters instead of 8 billion.
+LoRA (Low-Rank Adaptation) changes this equation. Instead of training all 8 billion parameters, the process freezes the original weights and injects small trainable matrices into key layers. This results in training about 42 million parameters instead of 8 billion.
 
 That's 0.5% of the original.
 
-Your memory requirements drop from 128GB to under 20GB. Suddenly single-GPU training is realistic.
+Memory requirements drop from 128GB to under 20GB. Suddenly single-GPU training becomes realistic.
 
 And there's a nice side effect for QAT: those small LoRA adapters learn to compensate for quantization effects. The base model stays frozen while the adapters figure out how to produce good outputs despite the simulated precision loss.
 
@@ -57,7 +57,7 @@ And there's a nice side effect for QAT: those small LoRA adapters learn to compe
 
 ## Walking Through the Implementation
 
-I've been working through this with Unsloth, which handles a lot of the complexity. Here's what each step actually does:
+This implementation uses Unsloth, which handles much of the complexity. Here's what each step actually does:
 
 ### Step 1: Load the Base Model
 
@@ -72,7 +72,7 @@ model, tokenizer = FastLanguageModel.from_pretrained(
 )
 ```
 
-We load the full-precision model in bfloat16. No quantization yet. The `load_in_4bit=False` is important—if you load an already-quantized model, you can't do QAT properly because the base weights are already compressed. The `max_lora_rank` prepares the model for LoRA injection.
+The model is loaded in full-precision bfloat16. No quantization yet. The `load_in_4bit=False` is important—if an already-quantized model is loaded, QAT can't be done properly because the base weights are already compressed. The `max_lora_rank` prepares the model for LoRA injection.
 
 ### Step 2: Apply LoRA with QAT
 
@@ -99,7 +99,7 @@ The `qat_scheme="fp8-int4"` tells Unsloth to simulate FP8 quantization during tr
 
 ### Step 3: Prepare the Dataset
 
-The model needs to see properly formatted conversations. We use the FineTome-100k dataset with Llama 3's chat template:
+The model needs to see properly formatted conversations. This implementation uses the FineTome-100k dataset with Llama 3's chat template:
 
 ```
 <|begin_of_text|><|start_header_id|>user<|end_header_id|>
@@ -109,7 +109,7 @@ What is 2+2?<|eot_id|><|start_header_id|>assistant<|end_header_id|>
 The answer is 4.<|eot_id|>
 ```
 
-Every conversation in your training data needs this exact format. Unsloth's `standardize_data_formats` and `get_chat_template` helpers handle this formatting automatically.
+Every conversation in training data needs this exact format. Unsloth's `standardize_data_formats` and `get_chat_template` helpers handle this formatting automatically.
 
 ### Step 4: Configure the Trainer
 
@@ -144,7 +144,7 @@ A few notes:
 
 ### Step 5: Train
 
-Now we start the actual training process. The training loop runs each forward pass through fake-quantized layers. The LoRA adapters adjust their weights to minimize loss despite the simulated precision reduction.
+Now the actual training process begins. The training loop runs each forward pass through fake-quantized layers. The LoRA adapters adjust their weights to minimize loss despite the simulated precision reduction.
 
 ```python
 trainer.train()
@@ -191,13 +191,13 @@ quantize_(model, QATConfig(step="convert"))
 
 ---
 
-## What You Get at the End
+## Training Results
 
-After training completes, you have LoRA adapters that are specifically tuned to work well with FP8 quantization.
+After training completes, the process produces LoRA adapters that are specifically tuned to work well with FP8 quantization.
 
 ### Saving the Model
 
-You have two options for saving the trained model:
+There are two options for saving the trained model:
 1. Save just the LoRA adapters separately (smaller file size)
 2. Save the full quantized model with torchao integration
 
@@ -214,9 +214,9 @@ model.save_pretrained_torchao("model-torchao", tokenizer)
 
 ## The Safetensors Limitation with FP8
 
-Here's something that caught me off guard: **FP8 quantized models can't be saved in safetensors format**.
+**FP8 quantized models can't be saved in safetensors format**.
 
-When you save a standard model, you can choose between PyTorch's `.bin` format or Hugging Face's `.safetensors` format. Safetensors is generally preferred because it's faster to load and more secure (no arbitrary code execution risk from pickle).
+When saving a standard model, there's a choice between PyTorch's `.bin` format or Hugging Face's `.safetensors` format. Safetensors is generally preferred because it's faster to load and more secure (no arbitrary code execution risk from pickle).
 
 But safetensors only supports standard tensor types:
 - float32, float16, bfloat16
@@ -229,7 +229,7 @@ This is a current limitation of the ecosystem. As FP8 support matures, we may se
 
 **What this means for deployment:**
 - Model loading is slightly slower than safetensors
-- You need to trust the source of the model files (pickle security concerns)
+- Source trust is important for model files (pickle security concerns)
 - The model still works correctly—it's just the file format
 
 ---
@@ -258,14 +258,12 @@ upload_folder(
 
 ## When QAT Makes Sense
 
-QAT isn't always necessary. If your model performs fine with basic post-training quantization, you don't need it.
+QAT isn't always necessary. If a model performs fine with basic post-training quantization, QAT isn't needed.
 
-But if you're:
+But QAT is worth the extra training time when:
 - Pushing to very low precision (FP8, INT4)
 - Seeing quality degradation after quantization
 - Deploying to edge devices where every bit counts
-
-Then QAT is worth the extra training time.
 
 The model learns to be robust to precision loss instead of being a victim of it.
 
@@ -275,9 +273,9 @@ The model learns to be robust to precision loss instead of being a victim of it.
 
 Quantization isn't just about making models smaller. It's about making them deployable. The gap between a model that runs in a research lab and one that runs in production often comes down to memory and compute efficiency.
 
-QAT bridges part of that gap. You accept some additional training complexity in exchange for models that maintain quality after compression.
+QAT bridges part of that gap. The approach trades some additional training complexity for models that maintain quality after compression.
 
-The current limitation with safetensors format is a minor inconvenience, not a blocker. The model works the same way—you just need to be mindful of where your model files come from.
+The current limitation with safetensors format is a minor inconvenience, not a blocker. The model works the same way—it's important to be mindful of model file sources.
 
 The math is simple: train with noise, deploy with confidence.
 
