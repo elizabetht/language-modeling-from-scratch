@@ -12,6 +12,6 @@ unsloth_training_checkpoints/
 hf/
 lora_model/
 model-torchao*/
-outputs/
+output*/
 
 
